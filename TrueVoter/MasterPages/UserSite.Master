@@ -1,0 +1,480 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="UserSite.master.cs" Inherits="TrueVoter.MasterPages.UserSite" %>
+
+<%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="asp" %>
+<!DOCTYPE html>
+<html lang="en">
+<head runat="server">
+    <meta charset="utf-8" />
+    <title><%: Page.Title %>TrueVoters</title>
+    <asp:PlaceHolder runat="server">
+        <%: Scripts.Render("~/bundles/modernizr") %>
+    </asp:PlaceHolder>
+    <webopt:BundleReference runat="server" Path="~/Content/css" />
+    <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+    <meta name="viewport" content="width=device-width" />
+    <asp:ContentPlaceHolder runat="server" ID="HeadContent" />
+
+    <link rel="stylesheet" href="../Content/new-css-transport.css" type="text/css" />
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+    <script src="http://ajax.aspnetcdn.com/ajax/jquery.ui/1.8.9/jquery-ui.js" type="text/javascript"></script>
+    <link href="http://ajax.aspnetcdn.com/ajax/jquery.ui/1.8.9/themes/start/jquery-ui.css" rel="stylesheet" type="text/css" />
+    <%--<link rel="stylesheet" href="../Content/new-css-transport.css" type="text/css" />--%>
+    <%--<link id="Link1" rel="shortcut icon" href="~/Images/Logo/OKCLlogo.png" type="image/x-icon" runat="server" />--%>
+    <script src="../Scripts/new-Jscript.js" type="text/javascript"></script>
+    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC6v5-2uaq_wusHDktM9ILcqIrlPtnZgEk&libraries=places&sensor=false"></script>
+
+    <script type="text/javascript">
+        (function (i, s, o, g, r, a, m) {
+            i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
+                (i[r].q = i[r].q || []).push(arguments)
+            }, i[r].l = 1 * new Date(); a = s.createElement(o),
+                m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
+        })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
+        ga('create', 'UA-99608405-1', 'auto');
+        ga('send', 'pageview');
+
+        function deleteConfirm(pubid) {
+            var result = confirm('Do you want to delete ' + pubid + ' ?');
+            if (result) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+        function numbersonly(evt) {
+            //debugger;
+            var charCode = (evt.fwhich) ? evt.which : event.keyCode;
+            if (charCode != 46 && charCode > 31
+                    && (charCode < 48 || charCode > 57))
+                return false;
+
+            return true;
+        }
+        function validate() {
+            if (page_ClientValidate())
+                return confirm('Data Uploaded...Are You sure You Want Print?');
+        }
+        function ConfirmSubmit() {
+            if (confirm('Are you sure to you want to save? This entry can not be modified or Updated later...'))
+                return true;
+            else
+                return false;
+        }
+
+        function Validate() {
+            var yes = confirm("Are you sure to you want to save? This entry can not be modified or Updated later...");
+            if (yes) {
+                Page_ClientValidate();
+                return Page_IsValid;
+            }
+            return false;
+        }
+
+        function numbersonly(evt) {
+            //debugger;
+            var charCode = (evt.fwhich) ? evt.which : event.keyCode;
+            if (charCode != 46 && charCode > 31
+                    && (charCode < 48 || charCode > 57))
+                return false;
+
+            return true;
+        }
+
+        function ConfirmSubmit() {
+            if (confirm('Are you sure to you want to save? This entry can not be modified or Updated later...'))
+                return true;
+            else
+                return false;
+        }
+
+        function Confirm() {
+            var confirm_value = document.createElement("INPUT");
+            confirm_value.type = "hidden";
+            confirm_value.name = "confirm_value";
+            if (confirm("Are you sure to you want to save? This entry can not be modified or Updated later?")) {
+                confirm_value.value = "Yes";
+            }
+            else {
+                confirm_value.value = "No";
+            }
+            document.forms[0].appendChild(confirm_value);
+        }
+
+
+
+        function Check_Click(objRef) {
+            //Get the Row based on checkbox
+            var row = objRef.parentNode.parentNode;
+            if (objRef.checked) {
+                //If checked change color to Aqua
+                row.style.backgroundColor = "aqua";
+            }
+            else {
+                //If not checked change back to original color
+                if (row.rowIndex % 2 == 0) {
+                    //Alternating Row Color
+                    row.style.backgroundColor = "#C2D69B";
+                }
+                else {
+                    row.style.backgroundColor = "white";
+                }
+            }
+
+            //Get the reference of GridView
+            var GridView = row.parentNode;
+
+            //Get all input elements in Gridview
+            var inputList = GridView.getElementsByTagName("input");
+
+            for (var i = 0; i < inputList.length; i++) {
+                //The First element is the Header Checkbox
+                var headerCheckBox = inputList[0];
+
+                //Based on all or none checkboxes
+                //are checked check/uncheck Header Checkbox
+                var checked = true;
+                if (inputList[i].type == "checkbox" && inputList[i] != headerCheckBox) {
+                    if (!inputList[i].checked) {
+                        checked = false;
+                        break;
+                    }
+                }
+            }
+            headerCheckBox.checked = checked;
+
+        }
+        function checkAll(objRef) {
+            var GridView = objRef.parentNode.parentNode.parentNode;
+            var inputList = GridView.getElementsByTagName("input");
+            for (var i = 0; i < inputList.length; i++) {
+                //Get the Cell To find out ColumnIndex
+                var row = inputList[i].parentNode.parentNode;
+                if (inputList[i].type == "checkbox" && objRef != inputList[i]) {
+                    if (objRef.checked) {
+                        //If the header checkbox is checked
+                        //check all checkboxes
+                        //and highlight all rows
+                        row.style.backgroundColor = "aqua";
+                        inputList[i].checked = true;
+                    }
+                    else {
+                        //If the header checkbox is checked
+                        //uncheck all checkboxes
+                        //and change rowcolor back to original
+                        if (row.rowIndex % 2 == 0) {
+                            //Alternating Row Color
+                            row.style.backgroundColor = "#C2D69B";
+                        }
+                        else {
+                            row.style.backgroundColor = "white";
+                        }
+                        inputList[i].checked = false;
+                    }
+                }
+            }
+        }
+        function MouseEvents(objRef, evt) {
+            var checkbox = objRef.getElementsByTagName("input")[0];
+            if (evt.type == "mouseover") {
+                objRef.style.backgroundColor = "orange";
+            }
+            else {
+                if (checkbox.checked) {
+                    objRef.style.backgroundColor = "aqua";
+                }
+                else if (evt.type == "mouseout") {
+                    if (objRef.rowIndex % 2 == 0) {
+                        //Alternating Row Color
+                        objRef.style.backgroundColor = "#C2D69B";
+                    }
+                    else {
+                        objRef.style.backgroundColor = "white";
+                    }
+                }
+            }
+        }
+
+
+
+        window.onload = function () {
+            // debugger;
+            var mapOptions1 =
+                        {
+                            center: new google.maps.LatLng(markers[0].lat, markers[0].lng),
+                            zoom: 20,
+                            mapTypeId: google.maps.MapTypeId.ROADMAP
+                        };
+            map1 = new google.maps.Map(document.getElementById("dvMap1"), mapOptions1);
+
+            for (i = 0; i < markers.length; i++) {
+
+                var data = markers[i];
+                var info = data.title + " " + data.description;
+                var myLatlng = new google.maps.LatLng(data.lat, data.lng);
+
+                var marker = new google.maps.Marker({
+                    position: myLatlng,
+                    map: map1,
+                    title: info
+                    //icon:'./Images/man1.png'//data.title
+                });
+                var infoWindow = new google.maps.InfoWindow();
+                (function (marker, data) {
+                    google.maps.event.addListener(marker, "click", function (e) {
+                        infoWindow.setContent('<div><strong>AcNo:</strong>' + data.ACNO + '  ' + '<strong>PartNo:</strong>' + data.PartNo + '<br>' + '<strong>SrNoFrom:</strong>' + data.SrNoFrom + '           ' + '<strong>SrNoTo:</strong>' + data.SrNoTo + '</div>');
+                        infoWindow.open(map1, marker);
+                    });
+                })(marker, data);
+            }
+            google.maps.event.addDomListener(window, 'load');
+        }
+
+        function numbersonly(evt) {
+            //debugger;
+            var charCode = (evt.fwhich) ? evt.which : event.keyCode;
+            if (charCode != 46 && charCode > 31
+                    && (charCode < 48 || charCode > 57))
+                return false;
+
+            return true;
+        }
+
+        function isValid() {
+            //debugger;
+            document.getElementById("txtAcNo");
+            if (document.getElementById("txtAcNo").innerText == '') {
+                document.getElementById("txtAcNo").innerText = "Enter Ac No";
+                window.alert("Enter AC No");
+            }
+            else { }
+        }
+
+        function Session_Expired() {
+            alert("Session Expired");
+            window.location.href = "../Admin/Login.aspx";
+        }
+    </script>
+</head>
+<body>
+    <form runat="server">
+        <%--<asp:ToolkitScriptManager ID="ScriptManager1" runat="server">
+        </asp:ToolkitScriptManager>--%>
+        <asp:ScriptManager runat="server">
+            <Scripts>
+                <%--To learn more about bundling scripts in ScriptManager see http://go.microsoft.com/fwlink/?LinkID=272931&clcid=0x409 --%>
+                <%--Framework Scripts--%>
+
+                <asp:ScriptReference Name="MsAjaxBundle" />
+                <asp:ScriptReference Name="jquery" />
+                <asp:ScriptReference Name="jquery.ui.combined" />
+                <asp:ScriptReference Name="WebForms.js" Assembly="System.Web" Path="~/Scripts/WebForms/WebForms.js" />
+                <asp:ScriptReference Name="WebUIValidation.js" Assembly="System.Web" Path="~/Scripts/WebForms/WebUIValidation.js" />
+                <asp:ScriptReference Name="MenuStandards.js" Assembly="System.Web" Path="~/Scripts/WebForms/MenuStandards.js" />
+                <asp:ScriptReference Name="GridView.js" Assembly="System.Web" Path="~/Scripts/WebForms/GridView.js" />
+                <asp:ScriptReference Name="DetailsView.js" Assembly="System.Web" Path="~/Scripts/WebForms/DetailsView.js" />
+                <asp:ScriptReference Name="TreeView.js" Assembly="System.Web" Path="~/Scripts/WebForms/TreeView.js" />
+                <asp:ScriptReference Name="WebParts.js" Assembly="System.Web" Path="~/Scripts/WebForms/WebParts.js" />
+                <asp:ScriptReference Name="Focus.js" Assembly="System.Web" Path="~/Scripts/WebForms/Focus.js" />
+                <asp:ScriptReference Name="WebFormsBundle" />
+                <%--Site Scripts--%>
+            </Scripts>
+        </asp:ScriptManager>
+        <header>
+            <div class="content-wrapper">
+                <div class="float-left">
+                    <p class="site-title">
+                        <%--<a runat="server" href="~/">your logo here</a>--%>
+                        <img src="../Content/Images/imglogo.jpg" alt="Logo Image" width="110" height="100" title="Evidyalaya" />
+                    </p>
+                </div>
+                <div class="float-right">
+                    <section id="login">
+                        <asp:LoginView ID="LoginView1" runat="server" ViewStateMode="Disabled">
+                            <AnonymousTemplate>
+                                <ul>
+                                    <span class="glyphicon glyphicon-log-out"></span>
+                                    <li><a id="logoutLink" runat="server" style="font-family: Tahoma; font-size: small" href="~/Admin/Login.aspx">Log Out</a>&nbsp;</li>
+
+                                    <li>
+                                        <label>|</label>&nbsp;</li>
+                                    <li>
+                                        <label><b style="color: #0066ff; font-family: Tahoma; font-size: small">WelCome: </b></label>
+                                    </li>
+                                    <li>
+                                        <asp:Label ID="lblFirstName" runat="server" Style="color: #2b9c05; font-family: Tahoma; font-size: small; font-weight: bold;" Text="User Name"></asp:Label><li>
+                                </ul>
+                            </AnonymousTemplate>
+                            <LoggedInTemplate>
+                                <p>
+                                    Hello, <a id="A1" runat="server" class="username" href="~/Account/Manage" title="Manage your account">
+                                        <asp:LoginName ID="LoginName1" runat="server" CssClass="username" />
+                                    </a>!
+                                <asp:LoginStatus ID="LoginStatus1" runat="server" LogoutAction="Redirect" LogoutText="Log off" LogoutPageUrl="~/Reports/frmHome.aspx" />
+                                </p>
+                            </LoggedInTemplate>
+                        </asp:LoginView>
+                    </section>
+                    <nav class="navbar navbar-header">
+                        <div class="container-fluid">
+                            <ul class="nav navbar-nav">
+                                <li class="active" id="liHome" runat="server"><a href="../Reports/frmHomeUser.aspx">Home</a></li>
+                                <li class="dropdown" id="liSuperAdmin" runat="server" visible="false">
+                                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">SuperAdmin
+                                    <span class="caret"></span></a>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="../Reports/frmGetPassword.aspx">GET PASSWORD</a></li>
+                                        <li><a href="../Reports/frmGetOTP.aspx">GET OTP</a></li>
+                                        <li><a href="../Admin/Dynamic_Messaging.aspx">DYNAMIC MESSAGING</a></li>
+                                        <li><a href="../Admin/Dynamic_code_generate.aspx">GENERATE COUPON CODE</a></li>
+                                        <li><a href="../Admin/DistributeCode.aspx">DISTRIBUTE COUPON CODE</a></li>
+                                        <li><a href="../Reports/Registration_Sms.aspx">SMS REGISTRATION</a></li>
+                                        <li><a href="../Reports/SmsRecharge.aspx">SMS RECHARGE</a></li>
+                                        <li><a href="../Reports/frmAddLocalBody.aspx">ADD LOCAL BODY</a></li>
+                                        <li><a href="../Admin/OfficerSms.aspx">OFFICER SMS</a></li>
+                                        <%--<li><a href="../Reports/frmOfferPageReps.aspx">ADD OFFERS</a></li>--%>
+                                        <li><a href="../SuperAdmin/NominationDailySmsFire.aspx">NOMINATION DAILY SMS</a></li>
+                                        <li><a href="../Reports/frmUpdateSECStatus.aspx">CHANGE SEC STATUS</a></li>
+                                    </ul>
+                                </li>
+                                <li class="dropdown" id="liAdmin" runat="server" visible="false">
+                                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">Admin
+                                    <span class="caret"></span></a>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="../Reports/DemoReportPage.aspx">NOMINATION REPORTS</a></li>
+                                        <%--<li><a href="../Reports/frmAddRepresentative.aspx">ADD REPRESENTATIVE</a></li>--%>
+                                        <li><a href="../Reports/frmAddParty.aspx">ADD PARTY</a></li>
+                                        <li><a href="../Reports/frmAddPartyRepresentative.aspx">ADD PARTY REPRESENTATIVE</a></li>
+                                        <li><a href="../Reports/frmControlChartStatusCount.aspx">VOTER STATUS REPORT</a></li>
+                                        <li><a href="../Reports/frmReportCounts.aspx">DETAIL REPORTS</a></li>
+                                        <li><a href="../Reports/frmAddNewsNotification.aspx">ADD NEWS</a></li>
+                                        <%--<li><a href="../Reports/frmUploadVoterAnalysisData.aspx">UPLOAD VOTER ANALYSIS DATA</a></li>--%>
+                                        <li><a href="../Reports/frmSubExpenseUploadDownload.aspx">UPLOAD/DOWNLOAD SUBEXPENSE</a></li>
+                                        <li><a href="../Reports/frmUploadStandardRates.aspx">UPLOAD/DOWNLOAD STANDARD RATES</a></li>
+                                        <li><a href="../Reports/AddProformaNo5.aspx">ADD PROFORMA NO 5</a></li>
+                                        <li><a href="../Reports/AddProformaNo6.aspx">ADD PROFORMA NO 6</a></li>
+                                        <li><a href="../Reports/AddProformaNo7.aspx">ADD PROFORMA NO 7</a></li>
+                                    </ul>
+                                </li>
+                                <li class="dropdown" id="liAllReports" runat="server" visible="false">
+                                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">Reports
+                                    <span class="caret"></span></a>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="../Reports/frmBLOReport.aspx">JUNIOR REPORTS</a></li>
+                                        <li><a href="../Reports/frmDiscrepancy.aspx">DISCREPANCY</a></li>
+                                        <%--<li><a href="../Reports/TrueVoterReports.aspx">REGISTER OFFICERS REPORTS</a></li>--%>
+                                        <li><a href="../Reports/BLOReport_AcNoWise.aspx">BLO REPORTS</a></li>
+                                        <li><a href="../Reports/Deviation.aspx">DEVIATION REPORTS</a></li>
+                                        <li><a href="../Reports/DisplayExpenseLimit.aspx">EXPENSE LIMIT DETAILS</a></li>
+                                        <%--<li><a href="../Reports/frmDownloadSRate.aspx">DOWNLOAD STANDARD RATES</a></li>--%>
+                                        <li><a href="../Reports/AllReports.aspx">ALL REPORTS</a></li>
+                                        <li><a href="../Reports/frmExpHeadwiseReport.aspx">EXPENSE REPORTS</a></li>
+                                        <li><a href="../Reports/frmNotices.aspx">NOTICES REPORTS</a></li>
+                                    </ul>
+                                </li>
+                                <li class="dropdown" runat="server" id="liControlchrt" visible="false">
+                                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">Control Chart
+                                     <span class="caret"></span></a>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="../Reports/ControlChartReports.aspx">CONTROL CHART</a></li>
+                                        <li><a href="../Reports/updateControlChart.aspx">UPDATE CONTROL CHART</a></li>
+                                        <li><a href="../Reports/UploadControlChartData.aspx">UPLOAD CONTROLCHART BACKUP</a></li>
+                                        <li><a href="../Reports/frmUploadManualControlChart.aspx">UPLOAD MANUAL CONTROLCHART BACKUP</a></li>
+                                        <li><a href="../Reports/frmSplitAt.aspx">SPLIT CONTROL CHART DATA</a></li>
+                                        <li><a href="../Reports/frmCreateBooth.aspx">CREATE BOOTH</a></li>
+                                        <li><a href="../Reports/frmVoterObjectionDtls.aspx">VOTERLIST OBJECTION CONTROL CHART</a></li>
+                                        <li><a href="../Reports/frmDownloadCCData.aspx">VOTERS COUNT REPORT</a></li>
+                                        <li><a href="../Reports/frmACWardWiseCount.aspx">AC-WARD WISE CONTROLCHART REPORT</a></li>
+                                        <li><a href="../Reports/frmUploadBoothAddress.aspx">UPLOAD BOOTH ADDRESS</a></li>
+                                    </ul>
+                                </li>
+                                <li class="dropdown" runat="server" id="liApproveExpen" visible="false">
+                                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">Approve Daily Expenses
+                                     <span class="caret"></span></a>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="../Reports/upDateDailyExpenses.aspx">APPROVE DAILY EXPENSES</a></li>
+                                        <li><a href="../Reports/frmDailyExpense.aspx">ADD DAILY EXPENSES</a></li>
+                                    </ul>
+                                </li>
+                                <li class="dropdown" runat="server" id="liAcceptExp" visible="false">
+                                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">Accept Expenses
+                                     <span class="caret"></span></a>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="../Reports/frmaddExpenseByOfficerOne.aspx">ADD CANDIDATE DAILY EXPENSES</a></li>
+                                        <li><a href="../Reports/frmAcceptExpense.aspx">ACCEPT DAILY EXPENSES</a></li>
+
+                                    </ul>
+                                </li>
+                                <li class="dropdown" id="liExpenseRpt" runat="server" visible="false">
+                                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">Expense Reports
+                                     <span class="caret"></span></a>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="../Reports/ExtraDetails.aspx">ENTER BASIC DATA</a></li>
+                                        <li><a href="../Reports/frmAddFundDetails.aspx">FUND COLLECTION DETAILS</a></li>
+                                        <li><a href="../Reports/DailyExpenseSample1.aspx">PRO FORMA 1-PERSONAL EXPENSE</a></li>
+                                        <li><a href="../Reports/DailyExpenseSample2.aspx">PRO FORMA 2</a></li>
+                                        <li><a href="../Reports/DailyExpenseSample3.aspx">PRO FORMA 3</a></li>
+                                        <li><a href="../Reports/DailyExpenseSample4.aspx">PRO FORMA 4</a></li>
+                                        <li><a href="../Reports/frmGroupExpense.aspx">PRO FORMA 1-GROUP EXPENSE</a></li>
+                                    </ul>
+                                </li>
+                                <li class="dropdown" runat="server" id="liMarketMenu" visible="false">
+                                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">Market Reports
+                                     <span class="caret"></span></a>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="../Reports/frmMarketPersonReport.aspx">MARKET PERSON REPORT</a></li>
+                                    </ul>
+                                </li>
+                                <li class="dropdown" runat="server" id="liGramPanchayat" visible="false">
+                                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">Gram Panchayat
+                                     <span class="caret"></span></a>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="../Reports/ElectionDates.aspx">GRAMPANCHAYAT ELECTION DATE</a></li>
+                                    </ul>
+                                </li>
+                                <li class="dropdown" runat="server" id="liPartyOfficer" visible="false">
+                                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">Party Officer
+                                     <span class="caret"></span></a>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="../Reports/frmAddPartyRepresentative.aspx">ADD PARTY REPRESENTATIVE</a></li>
+                                        <li><a href="../Reports/ExtraDetails.aspx">ENTER BASIC DATA</a></li>
+                                        <li><a href="../Reports/AddProformaNo5.aspx">ADD PARTY CANDIDATE</a></li>
+                                        <li><a href="../Reports/AddProformaNo6.aspx">ADD PARTY EXPENSE</a></li>
+                                        <li><a href="../Reports/AddProformaNo7.aspx">ADD PARTY EXPENSE ON CANDIDATE</a></li>
+                                        <li><a href="../Reports/frmAddPartyFundDetails.aspx">ADD FUND DETAILS</a></li>
+                                        <li><a href="../Reports/DailyExpenseSample5.aspx">PRO FORMA 5</a></li>
+                                        <li><a href="../Reports/DailyExpenseSample6.aspx">PRO FORMA 6</a></li>
+                                        <li><a href="../Reports/DailyExpenseSample7.aspx">PRO FORMA 7</a></li>
+                                        <li><a href="../Reports/DailyExpenseSample8.aspx">PRO FORMA 8</a></li>
+                                        <li><a href="../Reports/DailyExpenseSample9.aspx">PRO FORMA 9</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="../Reports/HelpUserMaster.aspx">Help</a></li>
+                                <li><a href="#">AboutUs</a></li>
+                                <li><a href="#">ContactUs</a></li>
+                            </ul>
+                        </div>
+                    </nav>
+                </div>
+            </div>
+        </header>
+        <div id="body">
+            <asp:ContentPlaceHolder runat="server" ID="FeaturedContent" />
+            <section class="content-wrapper main-content clear-fix">
+                <asp:ContentPlaceHolder runat="server" ID="MainContent" />
+            </section>
+        </div>
+        <footer>
+            <div class="content-wrapper">
+                <div class="float-left">
+                    <p>&copy; <%: DateTime.Now.Year %> - Abhinav IT Solutions Pvt. Ltd, Pune</p>
+                </div>
+            </div>
+        </footer>
+    </form>
+</body>
+</html>
